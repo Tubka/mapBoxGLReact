@@ -7,7 +7,7 @@ import "../src/assets/css/now-ui-kit.css";
 // import "../src/assets/css/now-ui-kit.css.map";
 import "../src/assets/demo/demo.css";
 // <---
-import Map from './components/Map'
+import Map from './components/map'
 
 class Application extends React.Component {
     render() {
