@@ -1,7 +1,12 @@
-Before start project(`npm start`) need to install extension - `npm install`
+## Installation
 
-stack:
+`npm install` to install required dependencies
+
+## Stack
+
 React + Mapbox GL JS + Creative Tim Now UI Kit
+
+## How it works
 
 Create accordion with 2overlaps.
 First overlap:
@@ -10,6 +15,7 @@ Create Map with data OpenStreetMaps, possibility add marker on click with option
 Second overlap:
 Create table with list added markers(with coordinates) and ability to remove their.
 
+## Steps
 
 [X] Create accordion with 2 overlaps </br>
 [X] Create Map  </br>
