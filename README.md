@@ -1,3 +1,5 @@
+Before start project(`npm start`) need to install extension - `npm install`
+
 stack:
 React + Mapbox GL JS + Creative Tim Now UI Kit
 
