@@ -1,6 +1,7 @@
 ## Installation
 
 `npm install` to install required dependencies
+`npm start` to start application
 
 ## Stack
 

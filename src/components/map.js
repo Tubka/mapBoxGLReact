@@ -13,7 +13,8 @@ class Map extends React.Component {
     zoom: 6.5,
     currentMarkers: [],
     isOpenMap: true,
-    isOpenCoords: false
+    isOpenCoords: false,
+    modeMap: 'streets-v11'
     };
   }
 
@@ -42,6 +43,13 @@ class Map extends React.Component {
     })
   }
 
+  changeMode = () => {
+    console.log('cos tutaj dziala')
+    // this.setState({
+    //   modeMap: 'dark-v10'
+    // })
+  }
+
 
   componentDidMount() {
     this.setState({ isOpenMap: false });
@@ -49,7 +57,7 @@ class Map extends React.Component {
     mapboxgl.accessToken = 'pk.eyJ1IjoidHViZWN6a2EiLCJhIjoiY2s5YmtrandjMDE1dDNlcTlnb3NhdTl4OCJ9.SEkArbGMm-oq1xtZ8Q5o9w';
     this.map = new mapboxgl.Map({
       container: this.mapContainer,
-      style: 'mapbox://styles/mapbox/streets-v11',
+      style: `mapbox://styles/mapbox/${this.state.modeMap}`,
       center: [this.state.lng, this.state.lat],
       zoom: this.state.zoom
     });
@@ -78,6 +86,19 @@ class Map extends React.Component {
         currentMarkers: [...this.state.currentMarkers, this.marker]
       })
     });
+    // change mode --->
+    var layerList = document.getElementById('menu');
+    var inputs = layerList.getElementsByTagName('input');
+    
+    const switchLayer = (layer) => {
+      console.log()
+      var layerId = layer.target.id;
+      this.map.setStyle('mapbox://styles/mapbox/' + layerId);
+    }
+    for (var i = 0; i < inputs.length; i++) {
+        inputs[i].onclick = switchLayer;
+    }
+    // change mode <---
   }
   render() {
     let data = this.state.currentMarkers
