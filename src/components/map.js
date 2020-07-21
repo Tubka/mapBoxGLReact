@@ -1,8 +1,10 @@
 import React from 'react';
+import { connect} from 'react-redux'
 import mapboxgl from 'mapbox-gl';
 import '../site.css'
 import {Button, Collapse, CardBody, Card } from 'reactstrap';
-import MaterialTable from 'material-table'
+import * as action from '../redux/action.creators'
+
 
 class Map extends React.Component {
   constructor(props) {
@@ -13,36 +15,44 @@ class Map extends React.Component {
     zoom: 6.5,
     currentMarkers: [],
     isOpenMap: true,
-    isOpenCoords: false
     };
   }
 
-  handleToggleMap = () => {
-    this.setState({ 
-      isOpenMap: !this.state.isOpenMap });
-  }
+  handleChangeReduxCoords = () => this.props.handleChangeReduxCoords()
 
-  handleToggleCoords = () => {
-    this.setState({ 
-      isOpenCoords: !this.state.isOpenCoords });
-  }
+  handleAddToRedux = (marker) => this.props.handleAddToRedux(marker)
 
-  Clear = (a,b) => {
-    let currentMarkers = this.state.currentMarkers
-    currentMarkers.forEach(el => {
-      if(el.id === b.id) {
-        el.remove()
-      }
-    })
-    currentMarkers = currentMarkers.filter(el => {
-      return b.id !== el.id
-    })
-    this.setState({
-      currentMarkers: currentMarkers
-    })
+  handleSetNullId = () => this.props.handleSetNullId()
+
+  handleChangeReduxCoords = () => this.props.handleChangeReduxCoords()
+
+  handleToggleMap = () => this.setState({ isOpenMap: !this.state.isOpenMap });
+
+  changeModeMap = () => {
+    var layerList = document.getElementById('menu');
+    var inputs = layerList.getElementsByTagName('input');
+    const switchLayer = (layer) => {
+      var layerId = layer.target.id;
+      this.map.setStyle('mapbox://styles/mapbox/' + layerId);
+    }
+    for (let i = 0; i < inputs.length; i++) inputs[i].onclick = switchLayer
   }
 
 
+  componentDidUpdate(prevProps) {
+    const idToRemove = this.props.clickedCoords.coordsReducer.idToRemove
+  
+    if(idToRemove && prevProps.clickedCoords !== this.props.clickedCoords) {
+      const currentMarkers = this.state.currentMarkers.filter(el => {
+        if(el.id===idToRemove){
+          el.remove()
+        } else return el
+      })
+      this.setState({ currentMarkers })
+      this.handleSetNullId()
+    }
+  }
+  
   componentDidMount() {
     this.setState({ isOpenMap: false });
 
@@ -65,39 +75,20 @@ class Map extends React.Component {
       this.marker = new mapboxgl.Marker({
         draggable: true
       })
-      const onDragEnd = () => {
-        this.forceUpdate()
-      }
+      const onDragEnd = () => {this.handleChangeReduxCoords(); console.log(this.state.currentMarkers)}
          
       this.marker.on('dragend', onDragEnd);
       this.marker.setLngLat(e.lngLat).addTo(this.map);
       if(this.state.currentMarkers.length) {
         this.marker.id = this.state.currentMarkers[this.state.currentMarkers.length-1].id +1 
       } else this.marker.id = 1
-      this.setState({ 
-        currentMarkers: [...this.state.currentMarkers, this.marker]
-      })
+      this.setState({ currentMarkers: [...this.state.currentMarkers, this.marker] })
+      this.handleAddToRedux(this.marker)
     });
-    // change mode --->
-    var layerList = document.getElementById('menu');
-    var inputs = layerList.getElementsByTagName('input');
-    
-    const switchLayer = (layer) => {
-      var layerId = layer.target.id;
-      this.map.setStyle('mapbox://styles/mapbox/' + layerId);
-    }
-    for (var i = 0; i < inputs.length; i++) {
-        inputs[i].onclick = switchLayer;
-    }
-    // change mode <---
+
+    this.changeModeMap()
   }
   render() {
-    let data = this.state.currentMarkers
-    if(data.length) {
-      data = data.map(el => {
-        return {'id': el.id, 'xCoordinate': el._lngLat.lng, 'yCoordinate': el._lngLat.lat}
-      })
-    }
     return (
         <>
           <Button color="primary" onClick={this.handleToggleMap} style={{ marginBottom: '1rem', display: 'block' }}>{this.state.isOpenMap? 'Close map' : 'Open map'}</Button>
@@ -108,39 +99,21 @@ class Map extends React.Component {
               </CardBody>
             </Card>
           </Collapse>
-          <Button color="warning" onClick={this.handleToggleCoords} style={{ marginBottom: '1rem', display: 'block' }}>{this.state.isOpenCoords? 'Hidden coordinates' : 'Show coordinates'}</Button>
-          <Collapse isOpen={this.state.isOpenCoords}>
-            <Card>
-              <CardBody>
-                <div style={{ maxWidth: '100%', BackgroundColor: 'black' }}>
-                  <MaterialTable
-                    options={{
-                      search: false
-                    }}
-                    actions={[
-                      {
-                        icon: 'delete',
-                        tooltip: 'Delete marker',
-                        onClick: (event, rowData) => {
-                          this.Clear(event, rowData)
-                        }
-                      }
-                  ]}
-                    columns={[
-                      { title: 'ID', field: 'id', type: 'numeric' },
-                      { title: 'X', field: 'xCoordinate', type: 'numeric'},
-                      { title: 'Y', field: 'yCoordinate', type: 'numeric' },
-                    ]}
-                    data={data}
-                    title="Co-ordinates"
-                  />
-                </div>
-              </CardBody>
-            </Card>
-          </Collapse>
         </>
     )
   }
-}
-export default Map
 
+}
+
+
+const mapStateToProps = state => ({
+  clickedCoords: state
+})
+const mapDispatchToProps = dispatch => {
+  return {
+    handleAddToRedux: (marker) => dispatch(action.reduxAddCoords(marker)),
+    handleChangeReduxCoords: () => dispatch(action.reduxEditCoords()),
+    handleSetNullId: () => dispatch(action.setNull())  
+  }
+}
+export default connect(mapStateToProps, mapDispatchToProps)(Map)

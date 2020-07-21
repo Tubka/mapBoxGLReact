@@ -7,14 +7,19 @@ import "../src/assets/css/now-ui-kit.css";
 // import "../src/assets/css/now-ui-kit.css.map";
 import "../src/assets/demo/demo.css";
 // <---
-import Map from './components/map'
+import Map from './components/Map'
+import Coords from '../src/components/Coords'
+import store from './redux/store'
+import { Provider } from 'react-redux'
+
 
 class Application extends React.Component {
     render() {
         return (
-            <>
-                <Map/>
-            </>
+                <Provider store={store}>
+                    <Map/>
+                    <Coords/>
+                </Provider>
             )
     }   
 } 
