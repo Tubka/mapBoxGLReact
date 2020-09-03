@@ -5,7 +5,7 @@
 
 ## Stack
 
-React + Mapbox GL JS + Creative Tim Now UI Kit
+React + redux + Mapbox GL JS + Creative Tim Now UI Kit
 
 ## How it works
 
